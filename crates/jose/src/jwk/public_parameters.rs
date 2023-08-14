@@ -17,15 +17,9 @@ use mas_iana::jose::{
 };
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use serde_with::{
-    base64::{Base64, UrlSafe},
-    formats::Unpadded,
-    serde_as,
-};
 
 use super::ParametersInfo;
 
-#[serde_as]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "kty")]
 pub enum JsonWebKeyPublicParameters {
@@ -83,15 +77,14 @@ impl ParametersInfo for JsonWebKeyPublicParameters {
     }
 }
 
-#[serde_as]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct RsaPublicParameters {
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     n: Vec<u8>,
 
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     e: Vec<u8>,
 }
 
@@ -118,17 +111,16 @@ impl RsaPublicParameters {
     }
 }
 
-#[serde_as]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct EcPublicParameters {
     pub(crate) crv: JsonWebKeyEcEllipticCurve,
 
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     x: Vec<u8>,
 
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     y: Vec<u8>,
 }
 
@@ -154,13 +146,12 @@ impl ParametersInfo for EcPublicParameters {
     }
 }
 
-#[serde_as]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct OkpPublicParameters {
     crv: JsonWebKeyOkpEllipticCurve,
 
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     x: Vec<u8>,
 }
 

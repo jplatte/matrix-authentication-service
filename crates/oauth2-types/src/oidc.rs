@@ -25,10 +25,6 @@ use mas_iana::{
 };
 use parse_display::{Display, FromStr, ParseError};
 use serde::{Deserialize, Serialize};
-use serde_with::{
-    formats::SpaceSeparator, serde_as, skip_serializing_none, DeserializeFromStr, SerializeDisplay,
-    StringWithSeparator,
-};
 use thiserror::Error;
 use url::Url;
 
@@ -39,7 +35,7 @@ use crate::{
 
 /// An enum for types that accept either an [`OAuthClientAuthenticationMethod`]
 /// or an [`OAuthAccessTokenType`].
-#[derive(SerializeDisplay, DeserializeFromStr, Clone, PartialEq, Eq, Hash, Debug, Display)]
+#[derive(Clone, PartialEq, Eq, Hash, Debug, Display)]
 pub enum AuthenticationMethodOrAccessTokenType {
     /// An authentication method.
     #[display("{0}")]
@@ -57,6 +53,8 @@ pub enum AuthenticationMethodOrAccessTokenType {
     #[display("{0}")]
     Unknown(String),
 }
+
+impl_de_serialize_from_str_display!(AuthenticationMethodOrAccessTokenType);
 
 impl AuthenticationMethodOrAccessTokenType {
     /// Get the authentication method of this
@@ -115,9 +113,7 @@ impl From<OAuthAccessTokenType> for AuthenticationMethodOrAccessTokenType {
 }
 
 /// The kind of an application.
-#[derive(
-    SerializeDisplay, DeserializeFromStr, Clone, Copy, PartialEq, Eq, Hash, Debug, Display, FromStr,
-)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, Display, FromStr)]
 #[display(style = "lowercase")]
 pub enum ApplicationType {
     /// A web application.
@@ -127,14 +123,14 @@ pub enum ApplicationType {
     Native,
 }
 
+impl_de_serialize_from_str_display!(ApplicationType);
+
 /// Subject Identifier types.
 ///
 /// A Subject Identifier is a locally unique and never reassigned identifier
 /// within the Issuer for the End-User, which is intended to be consumed by the
 /// Client.
-#[derive(
-    SerializeDisplay, DeserializeFromStr, Clone, Copy, PartialEq, Eq, Hash, Debug, Display, FromStr,
-)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, Display, FromStr)]
 #[display(style = "lowercase")]
 pub enum SubjectType {
     /// This provides the same `sub` (subject) value to all Clients.
@@ -146,10 +142,10 @@ pub enum SubjectType {
     Pairwise,
 }
 
+impl_de_serialize_from_str_display!(SubjectType);
+
 /// Claim types.
-#[derive(
-    SerializeDisplay, DeserializeFromStr, Clone, Copy, PartialEq, Eq, Hash, Debug, Display, FromStr,
-)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, Display, FromStr)]
 #[display(style = "lowercase")]
 pub enum ClaimType {
     /// Claims that are directly asserted by the OpenID Provider.
@@ -163,6 +159,8 @@ pub enum ClaimType {
     /// Provider but are returned as references by the OpenID Provider.
     Distributed,
 }
+
+impl_de_serialize_from_str_display!(ClaimType);
 
 /// The default value of `response_modes_supported` if it is not set.
 pub static DEFAULT_RESPONSE_MODES_SUPPORTED: &[ResponseMode] =
@@ -185,7 +183,6 @@ pub static DEFAULT_CLAIM_TYPES_SUPPORTED: &[ClaimType] = &[ClaimType::Normal];
 /// All the fields with a default value are accessible via methods.
 ///
 /// [IANA registry]: https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#authorization-server-metadata
-#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct ProviderMetadata {
     /// Authorization server's issuer identifier URL.
@@ -193,6 +190,7 @@ pub struct ProviderMetadata {
     /// This field is required. The URL must use a `https` scheme, and must not
     /// contain a query or fragment. It must match the one used to build the
     /// well-known URI to query this metadata.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub issuer: Option<String>,
 
     /// URL of the authorization server's [authorization endpoint].
@@ -201,6 +199,7 @@ pub struct ProviderMetadata {
     /// contain a fragment.
     ///
     /// [authorization endpoint]: https://www.rfc-editor.org/rfc/rfc6749.html#section-3.1
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub authorization_endpoint: Option<Url>,
 
     /// URL of the authorization server's [token endpoint].
@@ -209,6 +208,7 @@ pub struct ProviderMetadata {
     /// contain a fragment.
     ///
     /// [token endpoint]: https://www.rfc-editor.org/rfc/rfc6749.html#section-3.2
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub token_endpoint: Option<Url>,
 
     /// URL of the authorization server's [JWK] Set document.
@@ -216,6 +216,7 @@ pub struct ProviderMetadata {
     /// This field is required. The URL must use a `https` scheme.
     ///
     /// [JWK]: https://www.rfc-editor.org/rfc/rfc7517.html
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub jwks_uri: Option<Url>,
 
     /// URL of the authorization server's [OAuth 2.0 Dynamic Client
@@ -224,6 +225,7 @@ pub struct ProviderMetadata {
     /// If this field is present, the URL must use a `https` scheme.
     ///
     /// [OAuth 2.0 Dynamic Client Registration]: https://www.rfc-editor.org/rfc/rfc7591
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub registration_endpoint: Option<Url>,
 
     /// JSON array containing a list of the OAuth 2.0 `scope` values that this
@@ -231,6 +233,7 @@ pub struct ProviderMetadata {
     ///
     /// If this field is present, it must contain at least the `openid` scope
     /// value.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub scopes_supported: Option<Vec<String>>,
 
     /// JSON array containing a list of the [OAuth 2.0 `response_type` values]
@@ -239,6 +242,7 @@ pub struct ProviderMetadata {
     /// This field is required.
     ///
     /// [OAuth 2.0 `response_type` values]: https://www.rfc-editor.org/rfc/rfc7591#page-9
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub response_types_supported: Option<Vec<ResponseType>>,
 
     /// JSON array containing a list of the [OAuth 2.0 `response_mode` values]
@@ -247,6 +251,7 @@ pub struct ProviderMetadata {
     /// Defaults to [`DEFAULT_RESPONSE_MODES_SUPPORTED`].
     ///
     /// [OAuth 2.0 `response_mode` values]: https://openid.net/specs/oauth-v2-multiple-response-types-1_0.html
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub response_modes_supported: Option<Vec<ResponseMode>>,
 
     /// JSON array containing a list of the [OAuth 2.0 `grant_type` values] that
@@ -255,12 +260,14 @@ pub struct ProviderMetadata {
     /// Defaults to [`DEFAULT_GRANT_TYPES_SUPPORTED`].
     ///
     /// [OAuth 2.0 `grant_type` values]: https://www.rfc-editor.org/rfc/rfc7591#page-9
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub grant_types_supported: Option<Vec<GrantType>>,
 
     /// JSON array containing a list of client authentication methods supported
     /// by this token endpoint.
     ///
     /// Defaults to [`DEFAULT_AUTH_METHODS_SUPPORTED`].
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub token_endpoint_auth_methods_supported: Option<Vec<OAuthClientAuthenticationMethod>>,
 
     /// JSON array containing a list of the JWS signing algorithms supported
@@ -272,25 +279,30 @@ pub struct ProviderMetadata {
     /// `token_endpoint_auth_methods_supported` contains
     /// [`OAuthClientAuthenticationMethod::PrivateKeyJwt`] or
     /// [`OAuthClientAuthenticationMethod::ClientSecretJwt`].
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub token_endpoint_auth_signing_alg_values_supported: Option<Vec<JsonWebSignatureAlg>>,
 
     /// URL of a page containing human-readable information that developers
     /// might want or need to know when using the authorization server.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub service_documentation: Option<Url>,
 
     /// Languages and scripts supported for the user interface, represented as a
     /// JSON array of language tag values from BCP 47.
     ///
     /// If omitted, the set of supported languages and scripts is unspecified.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub ui_locales_supported: Option<Vec<LanguageTag>>,
 
     /// URL that the authorization server provides to the person registering the
     /// client to read about the authorization server's requirements on how the
     /// client can use the data provided by the authorization server.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub op_policy_uri: Option<Url>,
 
     /// URL that the authorization server provides to the person registering the
     /// client to read about the authorization server's terms of service.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub op_tos_uri: Option<Url>,
 
     /// URL of the authorization server's [OAuth 2.0 revocation endpoint].
@@ -299,12 +311,14 @@ pub struct ProviderMetadata {
     /// not contain a fragment.
     ///
     /// [OAuth 2.0 revocation endpoint]: https://www.rfc-editor.org/rfc/rfc7009
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub revocation_endpoint: Option<Url>,
 
     /// JSON array containing a list of client authentication methods supported
     /// by this revocation endpoint.
     ///
     /// Defaults to [`DEFAULT_AUTH_METHODS_SUPPORTED`].
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub revocation_endpoint_auth_methods_supported: Option<Vec<OAuthClientAuthenticationMethod>>,
 
     /// JSON array containing a list of the JWS signing algorithms supported by
@@ -316,6 +330,7 @@ pub struct ProviderMetadata {
     /// `revocation_endpoint_auth_methods_supported` contains
     /// [`OAuthClientAuthenticationMethod::PrivateKeyJwt`] or
     /// [`OAuthClientAuthenticationMethod::ClientSecretJwt`].
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub revocation_endpoint_auth_signing_alg_values_supported: Option<Vec<JsonWebSignatureAlg>>,
 
     /// URL of the authorization server's [OAuth 2.0 introspection endpoint].
@@ -323,10 +338,12 @@ pub struct ProviderMetadata {
     /// If this field is present, the URL must use a `https` scheme.
     ///
     /// [OAuth 2.0 introspection endpoint]: https://www.rfc-editor.org/rfc/rfc7662
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub introspection_endpoint: Option<Url>,
 
     /// JSON array containing a list of client authentication methods or token
     /// types supported by this introspection endpoint.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub introspection_endpoint_auth_methods_supported:
         Option<Vec<AuthenticationMethodOrAccessTokenType>>,
 
@@ -339,107 +356,129 @@ pub struct ProviderMetadata {
     /// `intospection_endpoint_auth_methods_supported` contains
     /// [`OAuthClientAuthenticationMethod::PrivateKeyJwt`] or
     /// [`OAuthClientAuthenticationMethod::ClientSecretJwt`].
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub introspection_endpoint_auth_signing_alg_values_supported: Option<Vec<JsonWebSignatureAlg>>,
 
     /// [PKCE code challenge methods] supported by this authorization server.
     /// If omitted, the authorization server does not support PKCE.
     ///
     /// [PKCE code challenge]: https://www.rfc-editor.org/rfc/rfc7636
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub code_challenge_methods_supported: Option<Vec<PkceCodeChallengeMethod>>,
 
     /// URL of the OP's [UserInfo Endpoint].
     ///
     /// [UserInfo Endpoint]: https://openid.net/specs/openid-connect-core-1_0.html#UserInfo
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub userinfo_endpoint: Option<Url>,
 
     /// JSON array containing a list of the Authentication Context Class
     /// References that this OP supports.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub acr_values_supported: Option<Vec<String>>,
 
     /// JSON array containing a list of the Subject Identifier types that this
     /// OP supports.
     ///
     /// This field is required.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub subject_types_supported: Option<Vec<SubjectType>>,
 
     /// JSON array containing a list of the JWS signing algorithms (`alg`
     /// values) supported by the OP for the ID Token.
     ///
     /// This field is required.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_token_signing_alg_values_supported: Option<Vec<JsonWebSignatureAlg>>,
 
     /// JSON array containing a list of the JWE encryption algorithms (`alg`
     /// values) supported by the OP for the ID Token.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_token_encryption_alg_values_supported: Option<Vec<JsonWebEncryptionAlg>>,
 
     /// JSON array containing a list of the JWE encryption algorithms (`enc`
     /// values) supported by the OP for the ID Token.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_token_encryption_enc_values_supported: Option<Vec<JsonWebEncryptionEnc>>,
 
     /// JSON array containing a list of the JWS signing algorithms (`alg`
     /// values) supported by the UserInfo Endpoint.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub userinfo_signing_alg_values_supported: Option<Vec<JsonWebSignatureAlg>>,
 
     /// JSON array containing a list of the JWE encryption algorithms (`alg`
     /// values) supported by the UserInfo Endpoint.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub userinfo_encryption_alg_values_supported: Option<Vec<JsonWebEncryptionAlg>>,
 
     /// JSON array containing a list of the JWE encryption algorithms (`enc`
     /// values) supported by the UserInfo Endpoint.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub userinfo_encryption_enc_values_supported: Option<Vec<JsonWebEncryptionEnc>>,
 
     /// JSON array containing a list of the JWS signing algorithms (`alg`
     /// values) supported by the OP for Request Objects.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub request_object_signing_alg_values_supported: Option<Vec<JsonWebSignatureAlg>>,
 
     /// JSON array containing a list of the JWE encryption algorithms (`alg`
     /// values) supported by the OP for Request Objects.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub request_object_encryption_alg_values_supported: Option<Vec<JsonWebEncryptionAlg>>,
 
     /// JSON array containing a list of the JWE encryption algorithms (`enc`
     /// values) supported by the OP for Request Objects.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub request_object_encryption_enc_values_supported: Option<Vec<JsonWebEncryptionEnc>>,
 
     /// JSON array containing a list of the "display" parameter values that the
     /// OpenID Provider supports.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub display_values_supported: Option<Vec<Display>>,
 
     /// JSON array containing a list of the Claim Types that the OpenID Provider
     /// supports.
     ///
     /// Defaults to [`DEFAULT_CLAIM_TYPES_SUPPORTED`].
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub claim_types_supported: Option<Vec<ClaimType>>,
 
     /// JSON array containing a list of the Claim Names of the Claims that the
     /// OpenID Provider MAY be able to supply values for.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub claims_supported: Option<Vec<String>>,
 
     /// Languages and scripts supported for values in Claims being returned,
     /// represented as a JSON array of BCP 47 language tag values.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub claims_locales_supported: Option<Vec<LanguageTag>>,
 
     /// Boolean value specifying whether the OP supports use of the `claims`
     /// parameter.
     ///
     /// Defaults to `false`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub claims_parameter_supported: Option<bool>,
 
     /// Boolean value specifying whether the OP supports use of the `request`
     /// parameter.
     ///
     /// Defaults to `false`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub request_parameter_supported: Option<bool>,
 
     /// Boolean value specifying whether the OP supports use of the
     /// `request_uri` parameter.
     ///
     /// Defaults to `true`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub request_uri_parameter_supported: Option<bool>,
 
     /// Boolean value specifying whether the OP requires any `request_uri`
     /// values used to be pre-registered.
     ///
     /// Defaults to `false`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub require_request_uri_registration: Option<bool>,
 
     /// Indicates where authorization request needs to be protected as [Request
@@ -448,18 +487,21 @@ pub struct ProviderMetadata {
     /// Defaults to `false`.
     ///
     /// [Request Object]: https://www.rfc-editor.org/rfc/rfc9101.html
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub require_signed_request_object: Option<bool>,
 
     /// URL of the authorization server's [pushed authorization request
     /// endpoint].
     ///
     /// [pushed authorization request endpoint]: https://www.rfc-editor.org/rfc/rfc9126.html
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub pushed_authorization_request_endpoint: Option<Url>,
 
     /// Indicates whether the authorization server accepts authorization
     /// requests only via PAR.
     ///
     /// Defaults to `false`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub require_pushed_authorization_requests: Option<bool>,
 
     /// Array containing the list of prompt values that this OP supports.
@@ -468,16 +510,19 @@ pub struct ProviderMetadata {
     /// `create`] value.
     ///
     /// [prompt `create`]: https://openid.net/specs/openid-connect-prompt-create-1_0.html
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub prompt_values_supported: Option<Vec<Prompt>>,
 
     /// URL of the authorization server's [device authorization endpoint].
     ///
     /// [device authorization endpoint]: https://www.rfc-editor.org/rfc/rfc8628
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub device_authorization_endpoint: Option<Url>,
 
     /// URL of the authorization server's [RP-Initiated Logout endpoint].
     ///
     /// [RP-Initiated Logout endpoint]: https://openid.net/specs/openid-connect-rpinitiated-1_0.html
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub end_session_endpoint: Option<Url>,
 }
 
@@ -1072,14 +1117,13 @@ fn validate_signing_alg_values_supported<'a>(
 /// The body of a request to the [RP-Initiated Logout Endpoint].
 ///
 /// [RP-Initiated Logout Endpoint]: https://openid.net/specs/openid-connect-rpinitiated-1_0.html
-#[skip_serializing_none]
-#[serde_as]
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct RpInitiatedLogoutRequest {
     /// ID Token previously issued by the OP to the RP.
     ///
     /// Recommended, used as a hint about the End-User's current authenticated
     /// session with the Client.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id_token_hint: Option<String>,
 
     /// Hint to the Authorization Server about the End-User that is logging out.
@@ -1088,6 +1132,7 @@ pub struct RpInitiatedLogoutRequest {
     /// discretion. For instance, the value might contain an email address,
     /// phone number, username, or session identifier pertaining to the RP's
     /// session with the OP for the End-User.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub logout_hint: Option<String>,
 
     /// OAuth 2.0 Client Identifier valid at the Authorization Server.
@@ -1098,6 +1143,7 @@ pub struct RpInitiatedLogoutRequest {
     /// `id_token_hint` values that require the Client Identifier to be
     /// specified by other means, so that the ID Tokens can be decrypted by
     /// the OP.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub client_id: Option<String>,
 
     /// URI to which the RP is requesting that the End-User's User Agent be
@@ -1105,17 +1151,19 @@ pub struct RpInitiatedLogoutRequest {
     ///
     /// The value MUST have been previously registered with the OP, using the
     /// `post_logout_redirect_uris` registration parameter.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub post_logout_redirect_uri: Option<Url>,
 
     /// Opaque value used by the RP to maintain state between the logout request
     /// and the callback to the endpoint specified by the
     /// `post_logout_redirect_uri` parameter.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub state: Option<String>,
 
     /// End-User's preferred languages and scripts for the user interface,
     /// ordered by preference.
-    #[serde_as(as = "Option<StringWithSeparator::<SpaceSeparator, LanguageTag>>")]
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    // TODO: #[serde_as(as = "Option<StringWithSeparator::<SpaceSeparator, LanguageTag>>")]
     pub ui_locales: Option<Vec<LanguageTag>>,
 }
 

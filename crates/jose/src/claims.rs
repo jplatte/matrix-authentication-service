@@ -408,20 +408,8 @@ impl From<chrono::DateTime<chrono::Utc>> for Timestamp {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
-#[serde(
-    transparent,
-    bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>")
-)]
-pub struct OneOrMany<T>(
-    // serde_as seems to not work properly with #[serde(transparent)]
-    // We have use plain old #[serde(with = ...)] with serde_with's utilities, which is a bit
-    // verbose but works
-    #[serde(
-        with = "serde_with::As::<serde_with::OneOrMany<serde_with::Same, serde_with::formats::PreferOne>>"
-    )]
-    Vec<T>,
-);
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OneOrMany<T>(Vec<T>);
 
 impl<T> Deref for OneOrMany<T> {
     type Target = Vec<T>;
@@ -440,6 +428,36 @@ impl<T> From<Vec<T>> for OneOrMany<T> {
 impl<T> From<T> for OneOrMany<T> {
     fn from(value: T) -> Self {
         Self(vec![value])
+    }
+}
+
+impl<T> Serialize for OneOrMany<T>
+where
+    T: Serialize,
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let vec = &self.0;
+        if vec.len() == 1 {
+            vec[0].serialize(serializer)
+        } else {
+            vec.serialize(serializer)
+        }
+    }
+}
+
+impl<'de, T> Deserialize<'de> for OneOrMany<T>
+where
+    T: Deserialize<'de>,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        // untagged enum deserialization
+        todo!()
     }
 }
 

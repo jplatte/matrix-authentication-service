@@ -18,7 +18,7 @@
 
 use std::{collections::HashMap, ops::Deref};
 
-use chrono::{DateTime, Duration, Utc};
+use chrono::{serde::ts_seconds_option, DateTime, Duration, Utc};
 use language_tags::LanguageTag;
 use mas_iana::{
     jose::{JsonWebEncryptionAlg, JsonWebEncryptionEnc, JsonWebSignatureAlg},
@@ -26,7 +26,6 @@ use mas_iana::{
 };
 use mas_jose::jwk::PublicJsonWebKeySet;
 use serde::{Deserialize, Serialize};
-use serde_with::{serde_as, skip_serializing_none, TimestampSeconds};
 use thiserror::Error;
 use url::Url;
 
@@ -875,27 +874,31 @@ pub enum ClientMetadataVerificationError {
 }
 
 /// The issuer response to dynamic client registration.
-#[serde_as]
-#[skip_serializing_none]
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct ClientRegistrationResponse {
     /// A unique client identifier.
     pub client_id: String,
 
     /// A client secret, if the `token_endpoint_auth_method` requires one.
-    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub client_secret: Option<String>,
 
     /// Time at which the Client Identifier was issued.
-    #[serde(default)]
-    #[serde_as(as = "Option<TimestampSeconds<i64>>")]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "ts_seconds_option"
+    )]
     pub client_id_issued_at: Option<DateTime<Utc>>,
 
     /// Time at which the client_secret will expire or 0 if it will not expire.
     ///
     /// Required if `client_secret` is issued.
-    #[serde(default)]
-    #[serde_as(as = "Option<TimestampSeconds<i64>>")]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "ts_seconds_option"
+    )]
     pub client_secret_expires_at: Option<DateTime<Utc>>,
 }
 

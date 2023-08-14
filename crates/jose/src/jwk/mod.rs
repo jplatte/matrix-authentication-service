@@ -20,11 +20,6 @@ use mas_iana::jose::{
 };
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use serde_with::{
-    base64::{Base64, Standard, UrlSafe},
-    formats::{Padded, Unpadded},
-    serde_as, skip_serializing_none,
-};
 use url::Url;
 
 use crate::constraints::{Constrainable, Constraint, ConstraintSet};
@@ -60,8 +55,6 @@ impl JwkEcCurve for k256::Secp256k1 {
     const CRV: JsonWebKeyEcEllipticCurve = JsonWebKeyEcEllipticCurve::Secp256K1;
 }
 
-#[serde_as]
-#[skip_serializing_none]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct JsonWebKey<P> {
     #[serde(flatten)]
@@ -85,17 +78,17 @@ pub struct JsonWebKey<P> {
 
     #[schemars(with = "Vec<String>")]
     #[serde(default)]
-    #[serde_as(as = "Option<Vec<Base64<Standard, Padded>>>")]
+    // TODO: #[serde_as(as = "Option<Vec<Base64<Standard, Padded>>>")]
     x5c: Option<Vec<Vec<u8>>>,
 
     #[schemars(with = "Option<String>")]
     #[serde(default)]
-    #[serde_as(as = "Option<Base64<UrlSafe, Unpadded>>")]
+    // TODO: #[serde_as(as = "Option<Base64<UrlSafe, Unpadded>>")]
     x5t: Option<Vec<u8>>,
 
     #[schemars(with = "Option<String>")]
     #[serde(default, rename = "x5t#S256")]
-    #[serde_as(as = "Option<Base64<UrlSafe, Unpadded>>")]
+    // TODO: #[serde_as(as = "Option<Base64<UrlSafe, Unpadded>>")]
     x5t_s256: Option<Vec<u8>>,
 }
 

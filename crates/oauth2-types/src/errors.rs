@@ -18,7 +18,6 @@ use std::borrow::Cow;
 
 use parse_display::{Display, FromStr};
 use serde::{Deserialize, Serialize};
-use serde_with::{DeserializeFromStr, SerializeDisplay};
 
 /// A client error returned by an authorization server.
 ///
@@ -60,7 +59,7 @@ impl From<ClientErrorCode> for ClientError {
 }
 
 /// Client error codes defined in OAuth2.0, OpenID Connect and their extensions.
-#[derive(Debug, Clone, PartialEq, Eq, Display, FromStr, SerializeDisplay, DeserializeFromStr)]
+#[derive(Debug, Clone, PartialEq, Eq, Display, FromStr)]
 #[display(style = "snake_case")]
 pub enum ClientErrorCode {
     /// `invalid_request`
@@ -370,6 +369,8 @@ impl ClientErrorCode {
         }
     }
 }
+
+impl_de_serialize_from_str_display!(ClientErrorCode);
 
 #[cfg(test)]
 mod tests {

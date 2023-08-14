@@ -27,7 +27,6 @@ use serde::{
     Deserialize, Serialize,
 };
 use serde_json::Value;
-use serde_with::{serde_as, skip_serializing_none, DurationSeconds};
 use url::Url;
 
 use super::{ClientMetadata, Localized, VerifiedClientMetadata};
@@ -89,43 +88,75 @@ impl<T> Localized<T> {
     }
 }
 
-#[serde_as]
-#[skip_serializing_none]
 #[derive(Serialize, Deserialize)]
 pub struct ClientMetadataSerdeHelper {
+    #[serde(skip_serializing_if = "Option::is_none")]
     redirect_uris: Option<Vec<Url>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     response_types: Option<Vec<ResponseType>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     grant_types: Option<Vec<GrantType>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     application_type: Option<ApplicationType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     contacts: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     jwks_uri: Option<Url>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     jwks: Option<PublicJsonWebKeySet>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     software_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     software_version: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     sector_identifier_uri: Option<Url>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     subject_type: Option<SubjectType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     token_endpoint_auth_method: Option<OAuthClientAuthenticationMethod>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     token_endpoint_auth_signing_alg: Option<JsonWebSignatureAlg>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     id_token_signed_response_alg: Option<JsonWebSignatureAlg>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     id_token_encrypted_response_alg: Option<JsonWebEncryptionAlg>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     id_token_encrypted_response_enc: Option<JsonWebEncryptionEnc>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     userinfo_signed_response_alg: Option<JsonWebSignatureAlg>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     userinfo_encrypted_response_alg: Option<JsonWebEncryptionAlg>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     userinfo_encrypted_response_enc: Option<JsonWebEncryptionEnc>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     request_object_signing_alg: Option<JsonWebSignatureAlg>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     request_object_encryption_alg: Option<JsonWebEncryptionAlg>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     request_object_encryption_enc: Option<JsonWebEncryptionEnc>,
-    #[serde_as(as = "Option<DurationSeconds<i64>>")]
+    #[serde(default, skip_serializing_if = "Option::is_none"
+    // TODO: with(as seconds)
+)]
     default_max_age: Option<Duration>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     require_auth_time: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     default_acr_values: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     initiate_login_uri: Option<Url>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     request_uris: Option<Vec<Url>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     require_signed_request_object: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     require_pushed_authorization_requests: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     introspection_signed_response_alg: Option<JsonWebSignatureAlg>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     introspection_encrypted_response_alg: Option<JsonWebEncryptionAlg>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     introspection_encrypted_response_enc: Option<JsonWebEncryptionEnc>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     post_logout_redirect_uris: Option<Vec<Url>>,
     #[serde(flatten)]
     extra: ClientMetadataLocalizedFields,

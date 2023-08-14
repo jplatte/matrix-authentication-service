@@ -17,16 +17,10 @@ use mas_iana::jose::{
 };
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use serde_with::{
-    base64::{Base64, UrlSafe},
-    formats::Unpadded,
-    serde_as,
-};
 use thiserror::Error;
 
 use super::{public_parameters::JsonWebKeyPublicParameters, ParametersInfo};
 
-#[serde_as]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "kty")]
 pub enum JsonWebKeyPrivateParameters {
@@ -114,12 +108,11 @@ impl TryFrom<JsonWebKeyPrivateParameters> for JsonWebKeyPublicParameters {
     }
 }
 
-#[serde_as]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct OctPrivateParameters {
     /// Key Value
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     k: Vec<u8>,
 }
 
@@ -137,47 +130,46 @@ impl ParametersInfo for OctPrivateParameters {
     }
 }
 
-#[serde_as]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct RsaPrivateParameters {
     /// Modulus
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     n: Vec<u8>,
 
     /// Exponent
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     e: Vec<u8>,
 
     /// Private Exponent
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     d: Vec<u8>,
 
     /// First Prime Factor
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     p: Vec<u8>,
 
     /// Second Prime Factor
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     q: Vec<u8>,
 
     /// First Factor CRT Exponent
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     dp: Vec<u8>,
 
     /// Second Factor CRT Exponent
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     dq: Vec<u8>,
 
     /// First CRT Coefficient
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     qi: Vec<u8>,
 
     /// Other Primes Info
@@ -208,22 +200,21 @@ impl From<RsaPrivateParameters> for super::public_parameters::RsaPublicParameter
     }
 }
 
-#[serde_as]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 struct RsaOtherPrimeInfo {
     /// Prime Factor
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     r: Vec<u8>,
 
     /// Factor CRT Exponent
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     d: Vec<u8>,
 
     /// Factor CRT Coefficient
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     t: Vec<u8>,
 }
 
@@ -263,21 +254,20 @@ mod rsa_impls {
     }
 }
 
-#[serde_as]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct EcPrivateParameters {
     pub(crate) crv: JsonWebKeyEcEllipticCurve,
 
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     x: Vec<u8>,
 
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     y: Vec<u8>,
 
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     d: Vec<u8>,
 }
 
@@ -365,13 +355,12 @@ mod ec_impls {
     }
 }
 
-#[serde_as]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct OkpPrivateParameters {
     crv: JsonWebKeyOkpEllipticCurve,
 
     #[schemars(with = "String")]
-    #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
+    // TODO: #[serde_as(as = "Base64<UrlSafe, Unpadded>")]
     x: Vec<u8>,
 }
 

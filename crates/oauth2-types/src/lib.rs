@@ -30,6 +30,28 @@
 #![warn(clippy::pedantic)]
 #![allow(clippy::module_name_repetitions)]
 
+macro_rules! impl_de_serialize_from_str_display {
+    ($ident:ident) => {
+        impl serde::Serialize for $ident {
+            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+            where
+                S: serde::Serializer,
+            {
+                todo!()
+            }
+        }
+
+        impl<'de> serde::Deserialize<'de> for $ident {
+            fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                todo!()
+            }
+        }
+    };
+}
+
 pub mod errors;
 pub mod oidc;
 pub mod pkce;

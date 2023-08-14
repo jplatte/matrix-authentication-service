@@ -14,52 +14,45 @@
 
 use mas_iana::jose::JsonWebSignatureAlg;
 use serde::{Deserialize, Serialize};
-use serde_with::{
-    base64::{Base64, Standard, UrlSafe},
-    formats::{Padded, Unpadded},
-    serde_as, skip_serializing_none,
-};
 use url::Url;
 
 use crate::jwk::PublicJsonWebKey;
 
-#[serde_as]
-#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct JsonWebSignatureHeader {
     alg: JsonWebSignatureAlg,
 
-    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     jku: Option<Url>,
 
-    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     jwk: Option<PublicJsonWebKey>,
 
-    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     kid: Option<String>,
 
-    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     x5u: Option<Url>,
 
-    #[serde(default)]
-    #[serde_as(as = "Option<Vec<Base64<Standard, Padded>>>")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    // TODO: #[serde_as(as = "Option<Vec<Base64<Standard, Padded>>>")]
     x5c: Option<Vec<Vec<u8>>>,
 
-    #[serde(default)]
-    #[serde_as(as = "Option<Base64<UrlSafe, Unpadded>>")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    // TODO: #[serde_as(as = "Option<Base64<UrlSafe, Unpadded>>")]
     x5t: Option<Vec<u8>>,
 
-    #[serde(default, rename = "x5t#S256")]
-    #[serde_as(as = "Option<Base64<UrlSafe, Unpadded>>")]
+    #[serde(skip_serializing_if = "Option::is_none", rename = "x5t#S256")]
+    // TODO: #[serde_as(as = "Option<Base64<UrlSafe, Unpadded>>")]
     x5t_s256: Option<Vec<u8>>,
 
-    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     typ: Option<String>,
 
-    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     cty: Option<String>,
 
-    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     crit: Option<Vec<String>>,
 }
 

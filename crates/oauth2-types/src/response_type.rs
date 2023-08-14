@@ -22,7 +22,7 @@ use std::{collections::BTreeSet, fmt, iter::FromIterator, str::FromStr};
 
 use mas_iana::oauth::OAuthAuthorizationEndpointResponseType;
 use parse_display::{Display, FromStr};
-use serde_with::{DeserializeFromStr, SerializeDisplay};
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 /// An error encountered when trying to parse an invalid [`ResponseType`].
@@ -37,19 +37,7 @@ pub struct InvalidResponseType;
 ///
 /// This type also accepts unknown tokens that can be constructed via it's
 /// `FromStr` implementation or used via its `Display` implementation.
-#[derive(
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Display,
-    FromStr,
-    SerializeDisplay,
-    DeserializeFromStr,
-)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Display, FromStr)]
 #[display(style = "snake_case")]
 #[non_exhaustive]
 pub enum ResponseTypeToken {
@@ -75,7 +63,7 @@ pub enum ResponseTypeToken {
 ///
 /// [OAuth 2.0 `response_type` value]: https://www.rfc-editor.org/rfc/rfc7591#page-9
 /// [authorization endpoint]: https://www.rfc-editor.org/rfc/rfc6749.html#section-3.1
-#[derive(Debug, Clone, PartialEq, Eq, SerializeDisplay, DeserializeFromStr)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ResponseType(BTreeSet<ResponseTypeToken>);
 
 impl std::ops::Deref for ResponseType {
@@ -184,6 +172,24 @@ impl From<OAuthAuthorizationEndpointResponseType> for ResponseType {
     }
 }
 
+impl Serialize for ResponseType {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        todo!()
+    }
+}
+
+impl<'de> Deserialize<'de> for ResponseType {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        todo!()
+    }
+}
+
 impl TryFrom<ResponseType> for OAuthAuthorizationEndpointResponseType {
     type Error = InvalidResponseType;
 
@@ -216,6 +222,24 @@ impl TryFrom<ResponseType> for OAuthAuthorizationEndpointResponseType {
         };
 
         Ok(res)
+    }
+}
+
+impl Serialize for ResponseTypeToken {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        todo!()
+    }
+}
+
+impl<'de> Deserialize<'de> for ResponseTypeToken {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        todo!()
     }
 }
 
